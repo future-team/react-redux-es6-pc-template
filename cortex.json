@@ -1,0 +1,38 @@
+{
+  "name": "apollo-template-static",
+  "version": "0.1.0",
+  "description": "apollo template for pc",
+  "devDependencies": {
+    "assert": "*"
+  },
+  "css": "dist/**/*.css",
+  "entries": [
+    "dist/**/*.js"
+  ],
+  "directories": {
+    "src": "dist"
+  },
+  "scripts": {
+    "prebuild": "./node_modules/.bin/gulp"
+  },
+  "dependencies": {
+    "react": "~0.14.1",
+    "redux": "^1.0.1",
+    "eagle-ui": "~1.0.1",
+    "moment": "^2.8.0",
+    "eagle": "~0.1.0"
+  },
+  "repository": "git://code.dianpingoa.com/pc-trade-f2e/apollo-template-static.git",
+  "keywords": [
+    "settlement"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "min.xiao@dianping.com",
+    "email": "min.xiao@dianping.com"
+  },
+  "bugs": {
+    "url": "http://code.dianpingoa.com/pc-trade-f2e/apollo-template-static/issues"
+  },
+  "homepage": "http://code.dianpingoa.com/pc-trade-f2e/apollo-template-static"
+}
