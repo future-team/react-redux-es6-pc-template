@@ -21,13 +21,13 @@ pc端脚手架项目
 
 ## 启动本地环境
 
-cnpm install
-cnpm install bower -g
-bower install
-cortex install  //不用可省略这一步骤
+cnpm install    
+cnpm install bower -g   
+bower install   
+cortex install  //不用可省略这一步骤 
 
-运行 npm run dev 进入调试
-运行 npm run build 打包
+运行 npm run dev 进入调试 
+运行 npm run build 打包 
 
 
 不需要jquery
