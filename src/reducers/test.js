@@ -1,4 +1,4 @@
-import { createReducer } from 'eagle';
+import { createReducer } from 'eg-tools';
 import Immutable from 'immutable';
 
 import {actionType} from '../constants/actionType';

@@ -52,34 +52,9 @@ gulp.task('hot', function (callback) {
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin()
     ];
+    wbpk.externals=null;
     wbpk.resolve.extensions = ['', '.js', '.jsx'];
     wbpk.output.libraryTarget='umd';
-    wbpk.externals=[{
-        'react': {
-            root: 'React',
-            commonjs2: 'react',
-            commonjs: 'react',
-            amd: 'react'
-        },
-        'react/addons': {
-            root: 'React',
-            commonjs2: 'react',
-            commonjs: 'react',
-            amd: 'react'
-        },/*
-        'eagle-ui': {
-            root: 'Eagleui',
-            commonjs2: 'eagle-ui',
-            commonjs: 'eagle-ui',
-            amd: 'eagle-ui'
-        },*/
-        'eagle': {
-            root: 'Eagle',
-            commonjs2: 'eagle',
-            commonjs: 'eagle',
-            amd: 'eagle'
-        }
-    }];
     wbpk.module.loaders = [
         {
             test: /date-time\.js$/,

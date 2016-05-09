@@ -4,7 +4,7 @@
 
 import {actionType} from '../constants/actionType';
 
-import {fetch} from 'eagle';
+import {fetch} from 'eg-tools';
 
 export function query(){
     return dispatch=>{
