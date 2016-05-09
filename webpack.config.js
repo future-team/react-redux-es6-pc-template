@@ -43,7 +43,7 @@ var webpackConfig = {
             }
         ]
     },
-    externals:setExternals(),
+    //externals:setExternals(),
     plugins: [
         new webpack.optimize.UglifyJsPlugin(),
         new ExtractTextPlugin(path.join('css/page.css'))
