@@ -13,7 +13,7 @@ pc端脚手架项目
 
 - …or push an existing repository from the command line
 ```bash
-    $ git remote add origin git@github.com:mtuan-f4/react-redux-es6-pc-template.git
+    $ git remote add origin git@github.com:future-team/react-redux-es6-pc-template.git
     $ git push -u origin master
 ```
 
@@ -22,12 +22,8 @@ pc端脚手架项目
 ## 启动本地环境
 
 cnpm install    
-cnpm install bower -g   
-bower install   
-cortex install  //不用可省略这一步骤 
-
 运行 npm run dev 进入调试 
 运行 npm run build 打包 
 
-
-不需要jquery
+## 技术支持暂时请联系
+min.xiao  xiaogang.huang
