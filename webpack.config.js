@@ -25,7 +25,7 @@ var webpackConfig = {
         //libraryTarget: 'umd',
         path:path.join(__dirname, 'dist'),
         filename: 'bundle.js',
-        publicPath: '/static/'
+        publicPath: '/dist/'
     },
     resolve: {
         extensions: ['', '.js']
@@ -40,10 +40,18 @@ var webpackConfig = {
                 test: /\.less$/,
                 loader: ExtractTextPlugin.extract("style-loader", "css-loader!less-loader")
                 //loader: "style-loader!css-loader!less-loader"
+            },
+            {
+                test:/\.png$/,
+                loader:'url-loader?limit=10000'
+            },
+            {
+                test: /\.html$/,
+                loader: "handlebars-loader"
             }
         ]
     },
-    //externals:setExternals(),
+    externals:setExternals(),
     plugins: [
         new webpack.optimize.UglifyJsPlugin(),
         new ExtractTextPlugin(path.join('css/page.css'))
