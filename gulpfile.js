@@ -1,92 +1,107 @@
 var gulp = require('gulp');
 var path = require('path');
 var gutil = require("gulp-util");
-var webpack = require("webpack");
-var WebpackDevServer = require("webpack-dev-server");
 var open = require('gulp-open');
+var webpackServer = require('./webpack-dev.config');
 var webpackConfig = require('./webpack.config');
 var less = require('gulp-less');
+var recombiner=require('cortex-recombiner');
+var includer = require('gulp-htmlincluder');
+var runSequence = require('run-sequence').use(gulp);
+var manifest = require('gulp-h-manifest');
+var clean = require('gulp-rimraf');
+var webpack = require("webpack");
+var glob = require("glob");
+var config = require('./src/config/base.config');
 
-var devPort = 3005;
+var devPort = config.devPort;
 
 gulp.task('open', function () {
-    gulp.src(__filename)
-        .pipe(open({uri: "http://127.0.0.1:" + devPort + "/index.html"}));
-});
-
-gulp.task('img', function() {
-    gulp.src('./img/**/*.*')
-        .pipe(gulp.dest('dist/img'));
-});
-
-gulp.task('less', function() {
-    gulp.src('./less/**/*.less')
-        .pipe(less({
-            paths: [
-                path.join(__dirname, 'less')
-            ]
-        }))
-        .pipe(gulp.dest('dist/css'));
-});
-
-gulp.task('build', function (callback) {
-    webpack(
-        webpackConfig, function (err, stats) {
-            if (err) throw new gutil.PluginError("webpack", err);
-            gutil.log("[webpack]", stats.toString({
-                // output options
-            }));
-            callback();
-    });
+  gulp.src(__filename)
+      .pipe(open({uri: "http://127.0.0.1:" + devPort +config.defaultStartPage}));
 });
 
 gulp.task('hot', function (callback) {
-    var wbpk = Object.create(webpackConfig);
-    wbpk.devtool = 'eval';
-    wbpk.entry = [
-        'webpack-dev-server/client?http://127.0.0.1:' + devPort,
-        'webpack/hot/only-dev-server',
-        './src/index.js'
-    ];
-    wbpk.plugins = [
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoErrorsPlugin()
-    ];
-    wbpk.externals=null;
-    wbpk.resolve.extensions = ['', '.js', '.jsx'];
-    wbpk.output.libraryTarget='umd';
-    wbpk.module.loaders = [
-        {
-            test: /date-time\.js$/,
-            loaders: ['muiLocal', 'babel']
-        },
-        {
-            test: /\.jsx?$/,
-            loaders: ['react-hot', 'babel'],
-            exclude: /node_modules/
-        },
-        {
-            test: /\.less$/,
-            loader: "style!css!less?strictMath&noIeCompat"
-        }
-    ];
-    var compiler = webpack(wbpk);
-
-    new WebpackDevServer(compiler, {
-        publicPath: '/dist/',
-        hot: true,
-        historyApiFallback: true,
-        port: devPort,
-        stats: {
-            colors: true
-        }
-    }).listen(devPort, "127.0.0.1", function (err) {
-            if (err) throw new gutil.PluginError("webpack-dev-server", err);
-            gutil.log("[webpack-dev-server]", "http://127.0.0.1:" + devPort + "/webpack-dev-server/index.html");
-        });
-
+  webpackServer();
 
 });
 
-gulp.task('default', ['build','img']);
-gulp.task('dev', ['hot', 'open','img']);
+gulp.task('cortex-recombiner', function() {
+  return recombiner({
+    base:__dirname,//项目根目录
+    noBeta:true
+  });
+});
+
+gulp.task('min-webpack', function (done) {
+  var wbpk = Object.create(webpackConfig);
+  wbpk.output.filename = '[name].min.js';
+  wbpk.plugins.push(new webpack.optimize.UglifyJsPlugin());
+
+  webpack(wbpk).run(function (err, stats) {
+    if (err) throw new gutil.PluginError("min-webpack", err);
+    gutil.log("[min-webpack]", stats.toString({
+    }));
+    done();
+  });
+});
+
+gulp.task('webpack', function (callback) {
+  webpack(
+      webpackConfig, function (err, stats) {
+        if (err) throw new gutil.PluginError("webpack", err);
+        gutil.log("[webpack]", stats.toString({
+          // output options
+        }));
+        callback();
+      });
+});
+
+gulp.task('html-includer', function() {
+  return gulp.src(config.html+'/**/*.html')
+      .pipe(includer())
+      .on('error', console.error)
+      .pipe(gulp.dest('html'));
+});
+
+gulp.task('manifest', function(cb) {
+
+  if(config.manifest){
+
+    glob(config.output+"/**/*.html",function(err,file){
+      var item;
+      var length =  file.length;
+      var index=1;
+      while(item = file.shift()){
+        gulp.src(item)
+            .pipe(manifest())
+            .pipe(gulp.dest(item.replace(/([\w-])*.html$/,'')))
+            .on("end",function(){
+              index == length ? cb() : (index++);
+            })
+      }
+    });
+  }
+
+});
+
+gulp.task('clean', function(){
+  gulp.src([
+    config.output
+  ], {read:false})
+      .pipe(clean());
+});
+
+gulp.task('html', function () {
+  return gulp.src([config.html+ '/**/*.*'])
+      .pipe(gulp.dest(config.output ));
+});
+
+gulp.task('default', function(){
+  runSequence('clean','cortex-recombiner','webpack','html','manifest');
+});
+gulp.task('dev', ['cortex-recombiner','hot', 'open']);
+
+gulp.task('watch', function() {
+  gulp.watch([config.html+'/**/*.html'],["html-includer"]);
+});

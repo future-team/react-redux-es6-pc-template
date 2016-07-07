@@ -1,49 +1,83 @@
 var webpack = require('webpack');
 var path = require('path');
+var glob = require('glob');
 var extend = require('extend');
+var entry = require('./src/config/vendor');
+var externals = require('./src/config/externals');
+var config = require('./src/config/base.config');
+var alias = require('./src/config/alias.json');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 //?presets[]=stage-0,presets[]=react,presets[]=es2015
+
 var setExternals= function() {
-    var cortexConfig = require('./cortex.json');
-    var externals={};
-    var deps = cortexConfig.dependencies;
+    var external=externals;
 
-
-    for(var item in deps){
-        externals[item] = 'require("' + item + '")';
-        console.dir(deps[item]);
-    }
-
-    return externals;
+    return external;
 };
 
+var baseFileDir = path.join(process.cwd(), 'src/');
+
+var getEntry = function(){
+    var basedir =baseFileDir+'entries';
+    var files = glob.sync(path.join(basedir, '*.jsx'));
+
+    var webpackConfigEntry = {};//webpackConfig.entry || (webpackConfig.entry = {});
+
+    files.forEach(function(file) {
+        var relativePath = path.relative(basedir, file);
+        webpackConfigEntry[relativePath.replace(/\.jsx/,'').toLowerCase()] = file;
+    });
+    return webpackConfigEntry;
+};
+
+
+function setCommonsChuck(){
+    var arr=[];
+    for(var item in entry){
+        arr.push(item);
+    }
+    return arr;
+}
+
+//extend(getEntry(),entry||{}),
+var entryList =config.projectType=='app'? extend(getEntry(),entry||{}) : extend({bundle:path.join(__dirname, 'src/index.jsx')},entry||{});
+
 var webpackConfig = {
-    entry: [
-        path.join(__dirname, 'src/index.js')
-    ],
+    entry: entryList,
     output: {
-        //libraryTarget: 'umd',
-        path:path.join(__dirname, 'dist'),
-        filename: 'bundle.js',
-        publicPath: '/dist/'
+        path:path.join(__dirname, config.output.replace('./','') ),
+        filename: '[name].js',
+        libraryTarget: "umd",
+        publicPath: config.cdn.beta
     },
+    externals:setExternals(),
     resolve: {
-        extensions: ['', '.js']
+        extensions: ['', '.js'],
+        alias:extend({},alias ||{})
     },
     module: {
         loaders: [
             {
-                test: /\.js$/,
+                test: /\.(jsx|es6)$/,
                 loaders: ['babel'],
                 exclude: /node_modules/
-            }, {
-                test: /\.less$/,
-                loader: ExtractTextPlugin.extract("style-loader", "css-loader!less-loader")
+            },
+            {
+                test: /\.(less$|css)$/,
+                loader: ExtractTextPlugin.extract("style-loader", "css-loader?sourceMap&importLoaders=1!autoprefixer-loader!less-loader")
                 //loader: "style-loader!css-loader!less-loader"
             },
             {
-                test:/\.png$/,
-                loader:'url-loader?limit=10000'
+                test: /\.svg$/,
+                loader: "url-loader?limit=10000&mimetype=image/svg+xml"
+            },
+            {
+                test: /\.woff|ttf|woff2|eot$/,
+                loader: 'url?limit=100000'
+            },
+            {
+                test: /\.(png|jpg|gif)$/,
+                loader: 'url?limit=35000'
             },
             {
                 test: /\.html$/,
@@ -51,10 +85,23 @@ var webpackConfig = {
             }
         ]
     },
-    externals:setExternals(),
+    /*postcss: [
+        require('autoprefixer'),
+        require('postcss-color-rebeccapurple')
+    ],*/
     plugins: [
-        new webpack.optimize.UglifyJsPlugin(),
-        new ExtractTextPlugin(path.join('css/page.css'))
+        //new webpack.optimize.UglifyJsPlugin(),
+        new ExtractTextPlugin('[name].css', { allChunks: true }),
+        new webpack.ProvidePlugin({
+            $:      "jquery",
+            jQuery: "jquery"
+        }),
+        new webpack.optimize.DedupePlugin(),
+        new webpack.optimize.CommonsChunkPlugin({
+            names: setCommonsChuck()/*,
+            children: true,
+            async: true*/
+        })
     ]
 };
 

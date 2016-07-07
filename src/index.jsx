@@ -1,10 +1,19 @@
+/**
+ * 主程序入口
+ */
 import React, { Component ,PropTypes} from 'react';
+import {render} from "react-dom";
+import {BindReact} from 'eg-tools';
+
+import * as reducers from './reducers/index.es6';
+
 import { Redirect, Router, Route } from 'react-router';
 import History from 'history/lib/createHashHistory';
 
-import Index from './IndexContainer';
+import TestWeb from './containers/test.jsx';
 
-export default class AppRouter extends Component {
+class AppRouter extends Component {
+
     constructor(props) {
         super(props);
         // Opt-out of persistent state, not recommended.
@@ -26,18 +35,17 @@ export default class AppRouter extends Component {
         return (
             <div>
                 <Router history={this.history}>
-                    <Route path="/index" name="index" component={Index} />
-                    <Redirect from="/" to="/index" />
+                    <Route path="/test" name="test" component={TestWeb} />
+                    <Redirect from="/" to="/test" />
                 </Router>
             </div>
         );
     }
-//<PaymentsComponent rsp={rsp} header={title} submit={submit}/>
 }
 
+//判断执行dev环境
 
-
-
-
-
-
+render(
+    <BindReact Module={AppRouter} reducers={reducers} />,
+    document.getElementById('root')
+);
