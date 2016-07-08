@@ -5,7 +5,6 @@ var open = require('gulp-open');
 var webpackServer = require('./webpack-dev.config');
 var webpackConfig = require('./webpack.config');
 var less = require('gulp-less');
-var recombiner=require('cortex-recombiner');
 var includer = require('gulp-htmlincluder');
 var runSequence = require('run-sequence').use(gulp);
 var manifest = require('gulp-h-manifest');
@@ -24,13 +23,6 @@ gulp.task('open', function () {
 gulp.task('hot', function (callback) {
   webpackServer();
 
-});
-
-gulp.task('cortex-recombiner', function() {
-  return recombiner({
-    base:__dirname,//项目根目录
-    noBeta:true
-  });
 });
 
 gulp.task('min-webpack', function (done) {
@@ -98,9 +90,9 @@ gulp.task('html', function () {
 });
 
 gulp.task('default', function(){
-  runSequence('clean','cortex-recombiner','webpack','html','manifest');
+  runSequence('clean','webpack','html','manifest');
 });
-gulp.task('dev', ['cortex-recombiner','hot', 'open']);
+gulp.task('dev', ['hot', 'open']);
 
 gulp.task('watch', function() {
   gulp.watch([config.html+'/**/*.html'],["html-includer"]);

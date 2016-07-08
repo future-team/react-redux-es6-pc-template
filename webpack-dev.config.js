@@ -4,6 +4,7 @@ var webpack = require("webpack");
 var WebpackDevServer = require("webpack-dev-server");
 var path = require('path');
 var gutil = require("gulp-util");
+var CortexRecombinerPlugin=require('cortex-recombiner-webpack-plugin');
 
 module.exports= function(){
 
@@ -48,6 +49,9 @@ module.exports= function(){
     ];
     wbpk.plugins = [
         new webpack.HotModuleReplacementPlugin(),
+        new CortexRecombinerPlugin({
+            base:__dirname//path.resolve(__dirname,relativeToRootPath),//项目根目录的绝对路径
+        }),
         new webpack.NoErrorsPlugin(),
         new webpack.ProvidePlugin({
             $:      "jquery",

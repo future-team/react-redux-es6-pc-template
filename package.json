@@ -58,6 +58,7 @@
     "babel-preset-react": "^6.1.18",
     "babel-preset-stage-0": "^6.1.18",
     "cortex-recombiner": "^1.0.13",
+    "cortex-recombiner-webpack-plugin": "^1.0.3",
     "css-loader": "0.17.0",
     "extend": "^3.0.0",
     "extract-text-webpack-plugin": "^0.8.2",

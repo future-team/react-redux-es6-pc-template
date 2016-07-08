@@ -7,6 +7,7 @@ var externals = require('./src/config/externals');
 var config = require('./src/config/base.config');
 var alias = require('./src/config/alias.json');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
+var CortexRecombinerPlugin=require('cortex-recombiner-webpack-plugin');
 //?presets[]=stage-0,presets[]=react,presets[]=es2015
 
 var setExternals= function() {
@@ -92,6 +93,9 @@ var webpackConfig = {
     plugins: [
         //new webpack.optimize.UglifyJsPlugin(),
         new ExtractTextPlugin('[name].css', { allChunks: true }),
+        new CortexRecombinerPlugin({
+            base:__dirname//path.resolve(__dirname,relativeToRootPath),//项目根目录的绝对路径
+        }),
         new webpack.ProvidePlugin({
             $:      "jquery",
             jQuery: "jquery"
